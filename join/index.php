@@ -30,17 +30,6 @@ if (isset($_POST) && !empty($_POST)){
 
 
 
-    //画像のアップロード処理
-    //例）1.pngを指定した時　$picture_nameの中身は201712221425301eriko1.pngというような文字列が代入される
-  //ファイル名の決定
-    $picture_name = date('YmdHis') . $_FILES['picture_path']['name'];
-
-
-    //アップロード(フォルダに書き込み権限がないと、保存されない)
-    //move_uploaded_file(
-    //アップロードしたいファイル、サーバのどこにどいう名前でアップロードするか指定)
-    move_uploaded_file($_FILES['picture_path']['tmp_name'], '../picture_path/'.$picture_name);
-
 
 
     // 入力チェック
@@ -71,6 +60,35 @@ if (isset($_POST) && !empty($_POST)){
     // 入力チェック後、エラーが何もなければ、check.phpに移動
     // $errorという変数が存在していなかった場合、入力が正常と認識
     if (!isset($error)) {
+
+
+      //画像の拡張子チェック
+
+      //jpg,pnp,gifはOK
+      //substr...文字列から範囲指定して一部分の文字を取り出す関数
+      //substr(文字列、切り出す文字のスタートの数) マイナスの場合は末尾からn文字目
+      // 例）1.png
+
+      $ext = substr($_FILES['picture_path']['name'],-3);
+
+
+
+  if (($ext == 'png') || ($ext == 'jpg') || ($ext == 'gif')){
+          //画像のアップロード処理
+      //例）1.pngを指定した時　$picture_nameの中身は201712221425301eriko1.pngというような文字列が代入される
+      //ファイル名の決定
+      $picture_name = date('YmdHis') . $_FILES['picture_path']['name'];
+
+
+      //アップロード(フォルダに書き込み権限がないと、保存されない)
+      //move_uploaded_file(
+      //アップロードしたいファイル、サーバのどこにどいう名前でアップロードするか指定)
+      move_uploaded_file($_FILES['picture_path']['tmp_name'], '../picture_path/'.$picture_name);
+
+
+
+
+
         //SESSION 変数に入力された値を保存(どこの画面からでも使用できる)
         // 注意！　必ずファイルの一番上に session_start();と書く
       //$POST送信された情報をjoinというキー指定で保存
@@ -81,17 +99,19 @@ if (isset($_POST) && !empty($_POST)){
       header('Location: check.php');
 
 
-        //これ以上のコードを無駄に処理しないように、このページの処理を終了させる
+      //これ以上のコードを無駄に処理しないように、このページの処理を終了させる
       exit();
+
+    }else{
+      $error["image"] = 'type';
     }
-
-
-
-
-
-
+  }
 
 }
+
+
+
+
  ?>
 
 
@@ -182,6 +202,10 @@ if (isset($_POST) && !empty($_POST)){
             <label class="col-sm-4 control-label">プロフィール写真</label>
             <div class="col-sm-8">
               <input type="file" name="picture_path" class="form-control">
+              <?php if((isset($error["image"])) && ($error["image"]== 'type')){  ?>
+              <p class="error">* 画像ファイルを選択してください</p>
+              <?php } ?>
+              
             </div>
           </div>
 
