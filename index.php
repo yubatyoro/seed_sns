@@ -17,6 +17,31 @@
 
   }
 
+//--------------------POST送信されていたらつぶやきをINSERTで保存------
+// $_POST["tweet"] => "" $_POSTが空だと思われない
+// $_POST["tweet"] => "" $_POST["tweet"]が空だと認識される
+
+
+ if (isset($_POST) && !empty($_POST["tweet"])){
+    //SQL文作成
+    //tweet=つぶやいた内容
+    //member_id=ログインした人のid
+    //reply_tweet_id=-1
+    //created=現在日時（now()を使用）
+    //modified=現在日時（now()を使用）
+    $sql = "INSERT INTO `tweets` (`tweet`, `member_id`, `reply_tweet_id`, `created`)VALUES(?,?,?,now())";
+
+    //SQL文実行
+        $data = array($_POST["tweet"],$_SESSION["id"],-1);
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute($data);
+      }
+
+
+
+
+
+
 
   //------------表示用のデータ取得--------------------------
   try {
@@ -32,6 +57,9 @@
   } catch (Exception $e) {
     
   }
+
+
+
 
 
 
