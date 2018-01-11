@@ -4,7 +4,7 @@ session_start();
 
 //クッキー情報が存在してたら（自動ログイン）
 //$_POSTにログイン情報を保存します
-if (isset($_cookie["email"]) && !empty($_cookie["email"])){
+if (isset($_COOKIE["email"]) && !empty($_COOKIE["email"])){
   $_POST["email"] = $_COOKIE["email"];
   $_POST["password"] = $_COOKIE["password"];
   $_POST["save"] = "on";
@@ -51,6 +51,8 @@ if (isset($_POST) && !empty($_POST)){
         setcookie('email',$_POST["email"], time()+60*60*24*14);
         setcookie('password',$_POST["password"], time()+60*60*24*14);
       }
+
+
       //ログイン後の画面に移動
       //4.ログイン後の初期表示画面へ移動（index.php:つぶやき画面に移動）
       header("Location: index.php");
