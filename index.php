@@ -1,5 +1,12 @@
 <?php
-  session_start();
+  //session_start();
+
+
+
+  require('function.php');
+
+//ログインチェック
+  login_check();
 
   //DBの接続
   require('dbconnect.php');
@@ -8,16 +15,8 @@
 
 
 
-  //ログインチェック
-  if (isset($_SESSION['id'])){
-      //ログインしている
-  }else{
-      //ログインしていない
-      //ログイン画面に飛ばす
-      header("Location: login.php");
-      exit();
 
-  }
+
 
 //--------------------POST送信されていたらつぶやきをINSERTで保存------
 // $_POST["tweet"] => "" $_POSTが空だと思われない
@@ -41,6 +40,7 @@
 
         //自分の画面に移動する（データの再送信防止）
         header("Location: index.php");
+        exit();
       }
 
 
@@ -63,7 +63,8 @@
     //一覧用の情報を取得
     // テーブル結合
     //ORDER BY `tweets`.`modified` DESC 最新順に並べ替え
-    $sql = "SELECT `tweets`.*,`members`.`nick_name`,`members`.`picture_path` FROM `tweets` INNER JOIN `members` ON `tweets`.`member_id`=`members`.`member_id` ORDER BY `tweets`.`modified` DESC";
+    //論理削除に対応 delete_flag = 0のものだけを取得
+    $sql = "SELECT `tweets`.*,`members`.`nick_name`,`members`.`picture_path` FROM `tweets` INNER JOIN `members` ON `tweets`.`member_id`=`members`.`member_id` WHERE `delete_flag`=0 ORDER BY `tweets`.`modified` DESC";
 
 
     $stmt = $dbh->prepare($sql);
@@ -83,6 +84,43 @@
       if ($one_tweet == false){
         break;
       }else{
+        //like数を求めるSQL文
+        $like_sql ="SELECT COUNT(*)as`like_count` FROM `likes` WHERE `tweet_id`=".$one_tweet["tweet_id"];
+
+        //SQL文実行
+        $like_stmt = $dbh->prepare($like_sql);
+        $like_stmt->execute();
+
+
+        $like_number = $like_stmt->fetch(PDO::FETCH_ASSOC);
+
+        // $one_tweetの中身
+        // $one_tweet["tweet"]つぶやき
+        // $one_tweet["member_id"] つぶやいた人のid
+        // $one_tweet["nick_name"] つぶやいた人のニックネーム
+        // $one_tweet["picture_path"] つぶやいた人のプロフィール画像
+        // $one_tweet["modified"] つぶやいた日時
+
+        //一行分のデータに新しいキーを用意して、like数を代入
+
+        $one_tweet["like_count"] = $like_number["like_count"];
+
+
+        //ログインしている人がlikeしているかどうかの情報を取得
+        $login_like_sql = "SELECT COUNT(*) as`like_count` FROM `likes` WHERE `tweet_id`=".$one_tweet["tweet_id"]." AND `member_id`=".$_SESSION["id"];
+
+        //SQL文の実行
+        $login_like_stmt = $dbh->prepare($login_like_sql);
+        $login_like_stmt->execute();
+
+        //フェッチして取得
+        $login_like_number = $login_like_stmt->fetch(PDO::FETCH_ASSOC);
+
+
+        $one_tweet["login_like_flag"] = $login_like_number["like_count"];
+
+
+
         //データ取得ができている
         $tweet_list[] = $one_tweet;
       }
@@ -175,10 +213,21 @@
           <p>
             <?php echo $one_tweet["tweet"]; ?><span class="name"> (<?php echo $one_tweet["nick_name"]; ?>)</span>
             [<a href="#">Re</a>]
-          </p>
+
+
+
+             <?php if ($one_tweet["login_like_flag"] == 0){ ?>
+            <a href="#"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>Like</a>
+            <?php }else{ ?>
+              <a href="#"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>UnLike</a>
+              <?php } ?>
+
+              
+
           <p class="day">
             <a href="view.php?tweet_id=<?php echo $one_tweet["tweet_id"]; ?>">
-              <?php 
+
+              <?php
               $modify_date = $one_tweet["modified"];
               // strtotime 文字型のデータを日時型に変換できる
               $modify_date = date("Y-m-d H:i",strtotime($modify_date));
@@ -189,7 +238,7 @@
 
             </a>
             [<a href="#" style="color: #00994C;">編集</a>]
-            [<a href="#" style="color: #F33;">削除</a>]
+            [<a onclick="return confirm('削除します、よろしいですか？');" href="delete.php?tweet_id=<?php echo $one_tweet["tweet_id"]; ?>"" style="color: #F33;">削除</a>]
           </p>
         </div>
 
