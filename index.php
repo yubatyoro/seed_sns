@@ -217,12 +217,13 @@
 
 
              <?php if ($one_tweet["login_like_flag"] == 0){ ?>
-            <a href="#"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>Like</a>
+            <a href="like.php?like_tweet_id=<?php echo $one_tweet["tweet_id"]; ?>"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>Like</a>
             <?php }else{ ?>
-              <a href="#"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>UnLike</a>
+              <a href="like.php?unlike_tweet_id=<?php echo $one_tweet["tweet_id"]; ?>"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>UnLike</a>
               <?php } ?>
 
-              
+              <?php if ($one_tweet["like_count"] > 0) {echo $one_tweet["like_count"];} ?>
+
 
           <p class="day">
             <a href="view.php?tweet_id=<?php echo $one_tweet["tweet_id"]; ?>">
