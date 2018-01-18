@@ -212,7 +212,7 @@
           <img src="picture_path/<?php echo $one_tweet["picture_path"]; ?>" width="48" height="48">
           <p>
             <?php echo $one_tweet["tweet"]; ?><span class="name"> (<?php echo $one_tweet["nick_name"]; ?>)</span>
-            [<a href="#">Re</a>]
+            [<a href="reply.php?tweet_id=<?php echo $one_tweet["tweet_id"]; ?>">Re</a>]
 
 
 
@@ -240,6 +240,9 @@
             </a>
             [<a href="#" style="color: #00994C;">編集</a>]
             [<a onclick="return confirm('削除します、よろしいですか？');" href="delete.php?tweet_id=<?php echo $one_tweet["tweet_id"]; ?>"" style="color: #F33;">削除</a>]
+            <?php if($one_tweet["reply_tweet_id"]> 0){ ?>
+            [<a href="view.php?tweet_id=<?php echo $one_tweet["reply_tweet_id"]; ?>"style="color: #a9a9a9;">返信元のメッセージを表示</a>]
+            <?php } ?>
           </p>
         </div>
 
