@@ -255,7 +255,8 @@
 
           <!-- 繰り返すタグが置かれる場所 -->
         <div class="msg">
-          <img src="picture_path/<?php echo $one_tweet["picture_path"]; ?>" width="48" height="48">
+          <a href="profile.php"><img src="picture_path/<?php echo $one_tweet["picture_path"]; ?>" width="48" height="48"></a>
+          
           <p>
             <?php echo $one_tweet["tweet"]; ?><span class="name"> (<?php echo $one_tweet["nick_name"]; ?>)</span>
             [<a href="reply.php?tweet_id=<?php echo $one_tweet["tweet_id"]; ?>">Re</a>]
@@ -263,9 +264,9 @@
 
 
              <?php if ($one_tweet["login_like_flag"] == 0){ ?>
-            <a href="like.php?like_tweet_id=<?php echo $one_tweet["tweet_id"]; ?>"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>Like</a>
+            <a href="like.php?like_tweet_id=<?php echo $one_tweet["tweet_id"]; ?>&page=<?php echo $page; ?>"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>Like</a>
             <?php }else{ ?>
-              <a href="like.php?unlike_tweet_id=<?php echo $one_tweet["tweet_id"]; ?>"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>UnLike</a>
+              <a href="like.php?unlike_tweet_id=<?php echo $one_tweet["tweet_id"]; ?>&page=<?php echo $page; ?>"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>UnLike</a>
               <?php } ?>
 
               <?php if ($one_tweet["like_count"] > 0) {echo $one_tweet["like_count"];} ?>
@@ -285,7 +286,7 @@
 
             </a>
             <?php if ($_SESSION["id"] == $one_tweet["member_id"]){ ?>
-            [<a href="#" style="color: #00994C;">編集</a>]
+            [<a href="edit.php?tweet_id=<?php echo $one_tweet["tweet_id"]; ?>" style="color: #00994C;">編集</a>]
             [<a onclick="return confirm('削除します、よろしいですか？');" href="delete.php?tweet_id=<?php echo $one_tweet["tweet_id"]; ?>"" style="color: #F33;">削除</a>]
             <?php } ?>
             <?php if($one_tweet["reply_tweet_id"]> 0){ ?>
