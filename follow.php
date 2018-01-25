@@ -56,6 +56,18 @@
   }
 
 
+  //フォロー解除処理
+  if (isset($_GET["unfollow_id"])) {
+    $sql = "DELETE FROM `follows` WHERE `member_id`=? AND `follower_id`=?";
+    $data = array($_SESSION["id"],$_GET["unfollow_id"]);
+    $unfl_stmt = $dbh->prepare($sql);
+    $unfl_stmt->execute($data);
+
+    //フォロー解除を押す前の状態に戻す
+    header("Location: follow.php");
+
+  }
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -130,7 +142,9 @@
           <a href="follow.php?follow_id=<?php echo $one_tweet["member_id"]; ?>">
         <button class="btn btn-default">フォロー</button></a>
           <?php }else{ ?>
-        <button class="btn btn-default">フォロー解除</button></a>
+        <a href="follow.php?unfollow_id=<?php echo $one_tweet["member_id"]; ?>">
+        <button class="btn btn-default">フォロー解除</button>
+        </a>
           <?php } ?>
         </div>
         <?php } ?>
