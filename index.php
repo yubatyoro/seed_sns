@@ -38,6 +38,12 @@
         $stmt->execute($data);
 
 
+
+
+//タグ機能登録
+
+
+
         //自分の画面に移動する（データの再送信防止）
         header("Location: index.php");
         exit();
@@ -108,9 +114,6 @@
     //一覧表示用の配列を用意
 
 
-    
-
-
     $tweet_list = array();
     // 複数のデータを取得するためのループ
     while (1) {
@@ -161,6 +164,20 @@
       }
     }
     
+    //Followingの数
+
+    $following_sql = "SELECT COUNT(*) as `cnt` FROM `follows` WHERE `member_id`=".$_SESSION["id"];
+    $following_stmt = $dbh->prepare($following_sql);
+    $following_stmt->execute();
+    $following = $following_stmt->fetch(PDO::FETCH_ASSOC);
+
+    //followerの数
+    $follower_sql = "SELECT COUNT(*) as `cnt` FROM `follows` WHERE `follower_id`=".$_SESSION["id"];
+    $follower_stmt = $dbh->prepare($follower_sql);
+    $follower_stmt->execute();
+    $follower = $follower_stmt->fetch(PDO::FETCH_ASSOC);
+
+
 
   } catch (Exception $e) {
     
@@ -229,6 +246,13 @@
                 <textarea name="tweet" cols="50" rows="5" class="form-control" placeholder="例：Hello World!"></textarea>
               </div>
             </div>
+            <!-- タグ -->
+            <div class="form-group">
+              <label class="col-sm-4 control-label">タグ</label>
+              <div class="col-sm-8">
+                <input type="text" name="hashtag" class="form-control" placeholder="例: #Japan #Cebu ">
+              </div>
+            </div>
           <ul class="paging">
             <input type="submit" class="btn btn-info" value="つぶやく">
                 &nbsp;&nbsp;&nbsp;&nbsp;
@@ -250,12 +274,15 @@
       </div>
 
       <div class="col-md-8 content-margin-top">
+        <div class="msg_header">
+        <a href="follow.php">Followers<span class="badge badge-pill badge-default"><?php echo $follower["cnt"]; ?></span></a> <a href="following.php">Following<span class="badge badge-pill badge-default"><?php echo $following["cnt"]; ?></span></a>
+      </div>
         <?php foreach ($tweet_list as $one_tweet) { 
           ?>
 
           <!-- 繰り返すタグが置かれる場所 -->
         <div class="msg">
-          <a href="profile.php"><img src="picture_path/<?php echo $one_tweet["picture_path"]; ?>" width="48" height="48"></a>
+          <a href="profile.php?member_id=<?php echo $one_tweet["member_id"]?>"><img src="picture_path/<?php echo $one_tweet["picture_path"]; ?>" width="48" height="48"></a>
           
           <p>
             <?php echo $one_tweet["tweet"]; ?><span class="name"> (<?php echo $one_tweet["nick_name"]; ?>)</span>
